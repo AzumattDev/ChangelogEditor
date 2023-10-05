@@ -1,9 +1,9 @@
 {
   "name": "ChangelogEditor",
-  "version_number": "1.0.4",
+  "version_number": "1.0.5",
   "website_url": "https://discord.gg/pdHgy6Bsng",
   "description": "A simple mod that allows you to change the changelog text at the main menu, or hide it entirely.",
   "dependencies": [
-    "denikson-BepInExPack_Valheim-5.4.2105"
+    "denikson-BepInExPack_Valheim-5.4.2200"
   ]
 }
