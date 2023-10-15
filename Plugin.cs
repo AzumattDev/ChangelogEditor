@@ -19,7 +19,7 @@ namespace ChangelogEditor
     public class ChangelogEditorPlugin : BaseUnityPlugin
     {
         internal const string ModName = "ChangelogEditor";
-        internal const string ModVersion = "1.0.5";
+        internal const string ModVersion = "1.0.6";
         internal const string Author = "Azumatt";
         private const string ModGUID = Author + "." + ModName;
         private static string ConfigFileName = ModGUID + ".cfg";
@@ -51,11 +51,15 @@ namespace ChangelogEditor
             shouldChangeText = config("1 - Changelog", "Should Change Text", Toggle.On, $"If on, your configuration file's text will be added to the changelog. (at the top). This pulls from the {ContentFile} found in your config folder.");
             overrideText = config("1 - Changelog", "Override Changelog Text", Toggle.Off, "If on, only your custom text that is set will show in the changlog. This deletes the default changelog text.");
             topicText = TextEntryConfig("1 - Changelog", "Title Text", "Changelog", "Change the title text of the changelog. This is the text that shows up in the top of the changelog.");
+            changelogWidth = config("1 - Changelog", "Width", 445f, "Width of the changelog window.");
+            //add a delegate to update the changelog width when the config is changed
+            changelogWidth.SettingChanged += UpdateChangelogWidth;
+
 
             // Create the content file if not exist
             if (!File.Exists(ContentFileFullPath))
             {
-                File.WriteAllText(ContentFileFullPath, $"This is the content file for ChangelogEditor. You can edit this file to change the changelog text.{Environment.NewLine}This file can be found currently at: {ContentFileFullPath}{Environment.NewLine}");
+                File.WriteAllText(ContentFileFullPath, $"This is the content file for ChangelogEditor. You can edit this file to change the changelog text.{Environment.NewLine}This file can be found currently at: {ContentFileFullPath}{Environment.NewLine}{Environment.NewLine}");
             }
             else
             {
@@ -70,7 +74,29 @@ namespace ChangelogEditor
         private void OnDestroy()
         {
             Config.Save();
+            changelogWidth.SettingChanged -= UpdateChangelogWidth;
         }
+
+        internal static void UpdateChangelogWidth(object sender, EventArgs e)
+        {
+            if (ChangelogGameObject == null) return;
+            RectTransform changelogRect = (RectTransform)ChangelogGameObject.transform;
+            RectTransform scrollPanelRect = (RectTransform)ChangelogGameObject.transform.Find("ScrollPanel");
+            RectTransform scrollBarRect = (RectTransform)ChangelogGameObject.transform.Find("PatchlogScroll");
+            var scrollPanelRectSizeDelta = scrollPanelRect.sizeDelta;
+            changelogRect.sizeDelta = new Vector2(changelogWidth.Value, scrollPanelRectSizeDelta.y);
+            scrollPanelRectSizeDelta = new Vector2(changelogWidth.Value, scrollPanelRectSizeDelta.y);
+            scrollPanelRect.sizeDelta = scrollPanelRectSizeDelta;
+            var anchoredPosition = scrollPanelRect.anchoredPosition;
+            scrollBarRect.anchoredPosition = new Vector2(anchoredPosition.x, anchoredPosition.y);
+            // Try to flip the scrollbar back to the left side of the changelog
+            scrollBarRect.anchorMin = new Vector2(0, 0);
+            scrollBarRect.anchorMax = new Vector2(0, 1);
+            scrollBarRect.pivot = new Vector2(0, 0.5f);
+            scrollBarRect.anchoredPosition = new Vector2(0, 0);
+            
+        }
+
 
         private void SetupWatcher()
         {
@@ -142,6 +168,7 @@ namespace ChangelogEditor
         internal static ConfigEntry<Toggle> shouldChangeText = null!;
         internal static ConfigEntry<Toggle> overrideText = null!;
         internal static ConfigEntry<string> topicText = null!;
+        internal static ConfigEntry<float> changelogWidth = null!;
 #if DEBUG
         private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
             bool synchronizedSetting = true)

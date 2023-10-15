@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,8 @@ static class ChangeLogStartPatch
     {
         // Store the Gameobject for later use
         ChangelogEditorPlugin.ChangelogGameObject = __instance.gameObject;
+        
+        ChangelogEditorPlugin.UpdateChangelogWidth(null, null);
 
         if (ChangelogEditorPlugin.overrideText.Value == ChangelogEditorPlugin.Toggle.On)
         {
@@ -27,6 +30,7 @@ static class ChangeLogStartPatch
     static void Postfix(ChangeLog __instance)
     {
         ChangeLogExtension.topicTmp = Utils.FindChild(__instance.transform, "Topic").GetComponent<TextMeshProUGUI>();
+        ChangeLogExtension.topicTmp.rectTransform.anchoredPosition += new Vector2(0, 20);
         __instance.UpdateChangelog();
     }
 }
@@ -50,11 +54,11 @@ public static class ChangeLogExtension
         UpdateTopicText(__instance);
         if (ChangelogEditorPlugin.overrideText.Value == ChangelogEditorPlugin.Toggle.On)
         {
-            __instance.m_textField.text = ChangelogEditorPlugin.customFileText;
+            __instance.m_textField.text = ChangelogEditorPlugin.customFileText.ToLiteral();
         }
         else if (ChangelogEditorPlugin.shouldChangeText.Value == ChangelogEditorPlugin.Toggle.On)
         {
-            __instance.m_textField.text = ChangelogEditorPlugin.customFileText + __instance.m_changeLog.text;
+            __instance.m_textField.text = ChangelogEditorPlugin.customFileText.ToLiteral() + __instance.m_changeLog.text;
         }
         else
         {
