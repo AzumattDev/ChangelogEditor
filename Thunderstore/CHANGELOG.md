@@ -1,5 +1,6 @@
 | `Version`   | `Update Notes`                                                                                                                                                          |
 |-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1.0.7       | - Compile against Valheim 0.217.28                                                                                                                                      |
 | 1.0.6       | - Fix some of the text not being taken literally and having escape characters.<br/> - Add a configuration option to change the width of the changelog (made by request) |
 | 1.0.5       | - Update for latest Valheim version to show I checked.                                                                                                                  |
 | 1.0.3/1.0.4 | - Update for Hildir's Request                                                                                                                                           |
